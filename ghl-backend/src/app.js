@@ -1,7 +1,7 @@
 const express = require("express");
 
-const oauthRoutes = require("./modules/oauth/routes");
-const webhookRoutes = require("./modules/webhook/routes");
+const oauthRoutes = require("./routes/oauth");
+const webhookRoutes = require("./routes/webhook");
 
 const app = express();
 
