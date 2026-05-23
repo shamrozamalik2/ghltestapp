@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 
 const services = require("../services/services");
-const { ReqMethods } = require("../../_enums");
-const { ApiErrorHandler } = require("../../_utils/handler");
+const { ReqMethods } = require("../enums/reqMethods");
+const { ApiErrorHandler } = require("../utils/ApiErrorHandler");
 
 const Route = () => {
   const routes = [
