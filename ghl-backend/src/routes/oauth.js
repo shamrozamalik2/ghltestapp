@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const services = require("../services/services");
+const oauth = require("../services/oauth");
 const { ReqMethods } = require("../enums/reqMethods");
 const { ApiErrorHandler } = require("../utils/ApiErrorHandler");
 
@@ -11,7 +11,7 @@ const Route = () => {
       method: ReqMethods.GET,
       url: "/callback",
       middlewares: [],
-      fn: ApiErrorHandler(services.OAuthCallback),
+      fn: ApiErrorHandler(oauth.OAuthCallback),
     },
   ];
 
