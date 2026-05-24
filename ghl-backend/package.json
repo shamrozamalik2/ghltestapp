@@ -2,9 +2,9 @@
   "name": "ghl-backend",
   "version": "1.0.0",
   "main": "index.js",
-   "scripts": {
+  "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon --watch src src/server.js"
   },
   "keywords": [],
   "author": "",
