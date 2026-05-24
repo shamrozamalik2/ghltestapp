@@ -40,13 +40,16 @@ const OAuthCallback = async (req) => {
 
     // ✅ save directly, no locations fetch needed
     const saved = await Token.findOneAndUpdate(
-      { locationId },
+      { "extras.locationId": locationId },
       {
-        locationId,
-        companyId,
         accessToken: access_token,
         refreshToken: refresh_token,
         expiresAt,
+        extras: {
+          locationId,
+          companyId,
+          appId: process.env.CLIENT_ID, // static app ID
+        },
       },
       { upsert: true, new: true }
     );

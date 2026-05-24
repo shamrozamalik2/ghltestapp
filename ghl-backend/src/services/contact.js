@@ -3,11 +3,15 @@ const Token = require("../models/token");
 
 const Create = async (req) => {
   try {
-    const { locationId } = req.params;
+    const { appId } = req.params;
+    const { locationId } = req.body.extras;
     console.log("locationId:", locationId);
     const { firstName, lastName, email, phone } = req.body;
 
-    const tokenDoc = await Token.findOne({ locationId });
+    const tokenDoc = await Token.findOne({
+      "extras.appId": appId,
+      "extras.locationId": locationId,
+    });
     console.log("tokenDoc:", tokenDoc);
 
     if (!tokenDoc) {

@@ -11,7 +11,7 @@ const Route = () => {
   const routes = [
     {
       method: ReqMethods.POST,
-      url: "/create-contact/:locationId",
+      url: "/create-contact/:appId",
       middlewares: [],
       // contact route handler should look like:
       fn: ApiErrorHandler(async (req, res) => {
