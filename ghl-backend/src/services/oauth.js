@@ -9,53 +9,57 @@ const OAuthCallback = async (req) => {
       return { success: false, message: "Missing code" };
     }
 
+    // 1. Exchange code for token
     const params = new URLSearchParams();
     params.append("client_id", process.env.CLIENT_ID);
     params.append("client_secret", process.env.CLIENT_SECRET);
     params.append("grant_type", "authorization_code");
     params.append("code", code);
     params.append("redirect_uri", process.env.REDIRECT_URI);
-    // add this somewhere in your app startup
-    console.log("🔌 MONGO_URI:", process.env.MONGO_URI);
+
     const tokenRes = await axios.post(
       "https://services.leadconnectorhq.com/oauth/token",
       params,
       { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
     );
 
-    const {
-      access_token,
-      refresh_token,
-      expires_in,
-      companyId,
-      locationId,  // ✅ comes directly from GHL now
-    } = tokenRes.data;
-
-    if (!locationId) {
-      return { success: false, message: "locationId missing from OAuth response" };
-    }
-
+    const { access_token, refresh_token, expires_in, companyId } = tokenRes.data;
     const expiresAt = new Date(Date.now() + expires_in * 1000);
 
-    // ✅ save directly, no locations fetch needed
-    const saved = await Token.findOneAndUpdate(
-      { locationId },
+    // 2. Fetch all locations under this company
+    const locationsRes = await axios.get(
+      "https://services.leadconnectorhq.com/locations/search",
       {
-        locationId,
-        companyId,
-        accessToken: access_token,
-        refreshToken: refresh_token,
-        expiresAt,
-      },
-      { upsert: true, new: true }
+        params: { companyId },
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          Version: "2021-07-28",
+        },
+      }
     );
 
-    console.log("💾 Token saved:", saved);        // is this printing?
-    console.log("📦 DB:", mongoose.connection.name); // which DB is it saving to?
+    const locations = locationsRes.data.locations;
+    console.log(`✅ Found ${locations.length} locations for company ${companyId}`);
+
+    // 3. Save token for each location
+    for (const loc of locations) {
+      await Token.findOneAndUpdate(
+        { locationId: loc.id },
+        {
+          locationId: loc.id,
+          companyId,
+          accessToken: access_token,
+          refreshToken: refresh_token,
+          expiresAt,
+        },
+        { upsert: true, new: true }
+      );
+      console.log(`💾 Token saved for locationId: ${loc.id}`);
+    }
 
     return {
       success: true,
-      message: "OAuth successful. Token saved.",
+      message: `OAuth successful. Tokens saved for ${locations.length} locations.`,
     };
   } catch (error) {
     console.log("❌ OAuth ERROR:", error.response?.data || error.message);
