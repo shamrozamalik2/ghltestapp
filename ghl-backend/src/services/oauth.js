@@ -1,4 +1,5 @@
 const axios = require("axios");
+const mongoose = require("mongoose"); // ✅ add this
 const Token = require("../models/token");
 
 const OAuthCallback = async (req) => {
