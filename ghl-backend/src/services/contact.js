@@ -9,7 +9,6 @@ const Create = async (req) => {
     const { firstName, lastName, email, phone } = req.body;
 
     const tokenDoc = await Token.findOne({
-      "extras.appId": appId,
       "extras.locationId": locationId,
     });
     console.log("tokenDoc:", tokenDoc);
